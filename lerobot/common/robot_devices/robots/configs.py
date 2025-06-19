@@ -26,6 +26,7 @@ from lerobot.common.robot_devices.cameras.configs import (
 from lerobot.common.robot_devices.motors.configs import (
     DynamixelMotorsBusConfig,
     FeetechMotorsBusConfig,
+    XarmMotorsBusConfig,
     MotorsBusConfig,
 )
 
@@ -556,6 +557,75 @@ class So100RobotConfig(ManipulatorRobotConfig):
 
     mock: bool = False
 
+@RobotConfig.register_subclass("xarm_lite6")
+@dataclass
+class XarmRobotConfig(ManipulatorRobotConfig):
+    calibration_dir: str = ".cache/calibration/xarm"
+    # `max_relative_target` limits the magnitude of the relative positional target vector for safety purposes.
+    # Set this to a positive scalar to have the same value for all motors, or a list that is the same length as
+    # the number of motors in your follower arms.
+    max_relative_target: int | None = None
+
+    leader_arms: dict[str, MotorsBusConfig] = field(
+        default_factory=lambda: {
+            "main": XarmMotorsBusConfig(
+                port="192.168.1.153",
+                motors={
+                    # name: (index, model) #TODO: Check whether the joint ranges commented here are accurate
+                    "joint_1": [1, "ufactory-lite6"], # +/- 360 degrees
+                    "joint_2": [2, "ufactory-lite6"], # +/- 132 degrees
+                    "joint_3": [3, "ufactory-lite6"], # -242 to 3.5 degrees
+                    "joint_4": [4, "ufactory-lite6"], # +/- 360 degrees
+                    "joint_5": [5, "ufactory-lite6"], # +/- 124 degrees
+                    "joint_6": [6, "ufactory-lite6"], # +/- 360 degrees
+                    "gripper": [7, "ufactory-lite6"],
+                },
+            ),
+        }
+    )
+
+    follower_arms: dict[str, MotorsBusConfig] = field(
+        default_factory=lambda: {
+            "main": XarmMotorsBusConfig(
+                port="192.168.1.224",
+                motors={
+                    # name: (index, model) #TODO: Check whether the joint ranges commented here are accurate
+                    "joint_1": [1, "ufactory-lite6"], # +/- 360 degrees
+                    "joint_2": [2, "ufactory-lite6"], # +/- 132 degrees
+                    "joint_3": [3, "ufactory-lite6"], # -242 to 3.5 degrees
+                    "joint_4": [4, "ufactory-lite6"], # +/- 360 degrees
+                    "joint_5": [5, "ufactory-lite6"], # +/- 124 degrees
+                    "joint_6": [6, "ufactory-lite6"], # +/- 360 degrees
+                    "gripper": [7, "ufactory-lite6"],
+                },
+            ),
+        }
+    )
+
+    cameras: dict[str, CameraConfig] = field(
+        default_factory=lambda: {
+            "side": OpenCVCameraConfig(
+                camera_index=0,
+                fps=30,
+                width=640,
+                height=480,
+            ),
+            "front": OpenCVCameraConfig(
+                camera_index=1,
+                fps=30,
+                width=640,
+                height=480,
+            ),
+            "fpv": OpenCVCameraConfig(
+                camera_index=2,
+                fps=30,
+                width=640,
+                height=360,
+            ),
+        }
+    )
+
+    mock: bool = False
 
 @RobotConfig.register_subclass("stretch")
 @dataclass

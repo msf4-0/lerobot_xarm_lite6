@@ -17,6 +17,7 @@ from typing import Protocol
 from lerobot.common.robot_devices.motors.configs import (
     DynamixelMotorsBusConfig,
     FeetechMotorsBusConfig,
+    XarmMotorsBusConfig,
     MotorsBusConfig,
 )
 
@@ -44,6 +45,11 @@ def make_motors_buses_from_configs(motors_bus_configs: dict[str, MotorsBusConfig
 
             motors_buses[key] = FeetechMotorsBus(cfg)
 
+        elif cfg.type == "xarm":
+            from lerobot.common.robot_devices.motors.ufactory import XArmWrapper
+
+            motors_buses[key] = XArmWrapper(cfg)
+
         else:
             raise ValueError(f"The motor type '{cfg.type}' is not valid.")
 
@@ -62,6 +68,12 @@ def make_motors_bus(motor_type: str, **kwargs) -> MotorsBus:
 
         config = FeetechMotorsBusConfig(**kwargs)
         return FeetechMotorsBus(config)
+
+    elif motor_type == "xarm":
+        from lerobot.common.robot_devices.motors.ufactory import XArmWrapper
+
+        config = XarmMotorsBusConfig(**kwargs)
+        return XArmWrapper(config)
 
     else:
         raise ValueError(f"The motor type '{motor_type}' is not valid.")

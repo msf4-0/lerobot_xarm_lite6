@@ -39,3 +39,10 @@ class FeetechMotorsBusConfig(MotorsBusConfig):
     port: str
     motors: dict[str, tuple[int, str]]
     mock: bool = False
+
+@MotorsBusConfig.register_subclass("xarm")
+@dataclass
+class XarmMotorsBusConfig(MotorsBusConfig):
+    port: str
+    motors: dict[str, tuple[int, str]]
+    mock: bool = False
